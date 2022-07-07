@@ -5,6 +5,7 @@
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: lisp, convenience
+;; Package-Requires: ((cl-lib "0.5"))
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/lispxmp.el
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -24,7 +25,7 @@
 
 ;;; Commentary:
 ;;
-;; Automagical annotation of lisp values like Ruby's xmpfilter. For
+;; Automagical annotation of Lisp values like Ruby's xmpfilter.  For
 ;; example, executing M-x lispxmp on the following buffer:
 ;;
 ;; ====
@@ -225,13 +226,13 @@
 ;;; Code:
 
 (defvar lispxmp-version "$Id: lispxmp.el,v 1.37 2017/01/10 23:11:59 rubikitch Exp $")
-(require 'cl)
+(require 'cl-lib)
 (require 'newcomment)
 (require 'pp)
 (require 'newxmp nil t)
 (eval-when-compile (require 'paredit nil t))
 (defgroup lispxmp nil
-  "lispxmp"
+  "Automagic Emacs Lisp code annotation."
   :group 'emacs)
 
 (defcustom lispxmp-string-no-properties t
@@ -281,7 +282,7 @@ http://mumble.net/~campbell/emacs/paredit.el"
 
 (defun lispxmp-adjust-pp-annotations ()
   (save-excursion
-    (loop while (re-search-forward "^\\(;+\\)\\( +=> \\)" nil t)
+    (cl-loop while (re-search-forward "^\\(;+\\)\\( +=> \\)" nil t)
           for next-line-re = (concat
                               "^"
                               (regexp-quote
@@ -296,7 +297,7 @@ http://mumble.net/~campbell/emacs/paredit.el"
 
 (defun lispxmp-add-out-markers ()
   (save-excursion
-    (loop while (re-search-forward "\\(;+\\) +=>" nil t)
+    (cl-loop while (re-search-forward "\\(;+\\) +=>" nil t)
           for use-pp = (eq (point-at-bol) (match-beginning 0))
           for semicolons = (match-string 1)
           for i from 0
@@ -385,7 +386,7 @@ http://mumble.net/~campbell/emacs/paredit.el"
                 " => "
                 ;; pair := (INDEX . VALUE)
                 (mapconcat 'cdr
-                           (remove-if-not (lambda (pair) (= index (car pair)))
+                           (cl-remove-if-not (lambda (pair) (= index (car pair)))
                                           (reverse results))
                            ", ")))))
   (lispxmp-out-remove))
