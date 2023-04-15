@@ -1,4 +1,4 @@
-;;; lispxmp.el --- Automagic emacs lisp code annotation
+;;; lispxmp.el --- Automagic emacs lisp code annotation  -*- lexical-binding: t; -*-
 ;; $Id: lispxmp.el,v 1.37 2017/01/10 23:11:59 rubikitch Exp $
 
 ;; Copyright (C) 2009, 2010, 2013, 2017  rubikitch
