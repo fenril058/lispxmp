@@ -230,7 +230,6 @@
 (require 'cl-lib)
 (require 'newcomment)
 (require 'pp)
-(require 'newxmp nil t)
 (eval-when-compile (require 'paredit nil t))
 (defgroup lispxmp nil
   "Automagic Emacs Lisp code annotation."
@@ -423,11 +422,6 @@ The function is the subset of the paredit-rase-sexp in paredit.el"
        ad-do-it)))
 (lispxmp-comment-advice comment-dwim)
 (lispxmp-comment-advice paredit-comment-dwim)
-
-(defun lispxmp-or-newxmp (arg)
-  (interactive "P")
-  (setq current-prefix-arg nil)
-  (call-interactively (if arg 'newxmp 'lispxmp)))
 
 ;;;; Bug report
 (defvar lispxmp-maintainer-mail-address
