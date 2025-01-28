@@ -411,17 +411,16 @@ The function is the subset of the paredit-rase-sexp in paredit.el"
   (lispxmp-out-remove))
 ;; (with-new-window (find-epp lispxmp-results))
 
-(defmacro lispxmp-comment-advice (func)
-  `(defadvice ,func (around lispxmp-hack activate)
-     ,(format "If `%s' is successively called, add => mark." func)
-     (if (and (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
-              (eq last-command ',func)
-              (not (member "=>" (list (ignore-errors (buffer-substring (- (point) 2) (point)))
-                                      (ignore-errors (buffer-substring (point) (+ (point) 2)))))))
-         (insert " =>")
-       ad-do-it)))
-(lispxmp-comment-advice comment-dwim)
-(lispxmp-comment-advice paredit-comment-dwim)
+(defun lispxmp-hack-comment-dwim (orig-fun &rest args)
+  "If comment-dwim is successively called, add => mark."
+  (if (and (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
+           (eq last-command this-command)
+           (not (member "=>" (list (ignore-errors (buffer-substring (- (point) 2) (point)))
+                                   (ignore-errors (buffer-substring (point) (+ (point) 2)))))))
+      (insert " =>"))
+  (apply orig-fun args))
+
+(advice-add 'comment-dwim :around #'lispxmp-hack-comment-dwim)
 
 ;;;; Bug report
 (defvar lispxmp-maintainer-mail-address
