@@ -298,11 +298,11 @@ If a region active, annotate only in the region."
 (defun lispxmp-add-out-markers ()
   (save-excursion
     (cl-loop while (re-search-forward "\\(;+\\) +=>" nil t)
-          for use-pp = (eq (point-at-bol) (match-beginning 0))
+          for use-pp = (eq (line-beginning-position) (match-beginning 0))
           for semicolons = (match-string 1)
           for i from 0
           when (lispxmp-annotation-p) do
-          (delete-region (match-beginning 0) (point-at-eol))
+          (delete-region (match-beginning 0) (line-end-position))
           (lispxmp-out-make-sexp use-pp (length semicolons) i)
           (insert (format "%s <<%%lispxmp-out-marker %d %d>>"
                           semicolons (length semicolons) i)))))
@@ -316,7 +316,7 @@ If a region active, annotate only in the region."
   (save-match-data
     (save-excursion
       (beginning-of-line)
-      (ignore-errors (comment-search-forward (point-at-eol) t))
+      (ignore-errors (comment-search-forward (line-end-position) t))
       (looking-at "=>"))))
 
 (defun lispxmp-out-make-sexp (use-pp semicolons-len i)
@@ -359,8 +359,7 @@ The function is the subset of the paredit-rase-sexp in paredit.el"
       ;; delete it.
       (backward-up-list)
       (delete-region (point) (scan-sexps (point) 1))
-      (let* ((indent-start (point))
-             (indent-end (save-excursion (insert sexps) (point))))))))
+      (save-excursion (insert sexps) (point)))))
 
 (defun %lispxmp-prin1-to-string (use-pp semicolons-len object)
   (let ((print-func (if use-pp 'pp-to-string 'prin1-to-string)))
