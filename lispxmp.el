@@ -235,11 +235,13 @@
   "Automagic Emacs Lisp code annotation."
   :group 'emacs)
 
+;;;###autoload
 (defcustom lispxmp-comment-dwim-enable-modes (list 'emacs-lisp-mode 'lisp-mode)
   "List of major modes where lispxmp-hack-comment-dwim is enabled."
   :type 'list
   :group 'lispxmp)
 
+;;;###autoload
 (defcustom lispxmp-string-no-properties t
   "*When non-nil, remove text priperties of strings in annotation."
   :type 'boolean
