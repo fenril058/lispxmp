@@ -340,7 +340,6 @@ If a region active, annotate only in the region."
       (forward-sexp)
       (and (search-forward ")" nil t) (replace-match "")))))
 
-(defvar lispxmp-results nil)
 (defun %lispxmp-out (use-pp semicolons-len index result)
   (push (cons index (%lispxmp-prin1-to-string use-pp semicolons-len result)) lispxmp-results)
   result)
@@ -371,8 +370,7 @@ The function is the subset of the paredit-rase-sexp in paredit.el"
       (insert (let (pp-escape-newlines) (funcall print-func object)))
       (goto-char 1)
       (save-excursion
-        (when (and lispxmp-string-no-properties
-                   (require 'paredit nil t))
+        (when lispxmp-string-no-properties
           (while (search-forward "#(\"" nil t)
             (forward-char -1)
             (lispxmp-raise-sexp)
