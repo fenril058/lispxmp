@@ -226,7 +226,7 @@
 
 ;;; Code:
 
-(defvar lispxmp-version "$Id: lispxmp.el,v 1.37 2017/01/10 23:11:59 rubikitch Exp $")
+(defconst lispxmp-version "$Id: lispxmp.el,v 1.37 2017/01/10 23:11:59 rubikitch Exp $")
 (require 'cl-lib)
 (require 'newcomment)
 (require 'pp)
