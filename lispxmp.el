@@ -230,10 +230,15 @@
 (require 'cl-lib)
 (require 'newcomment)
 (require 'pp)
-(eval-when-compile (require 'paredit nil t))
+
 (defgroup lispxmp nil
   "Automagic Emacs Lisp code annotation."
   :group 'emacs)
+
+(defcustom lispxmp-comment-dwim-enable-modes (list 'emacs-lisp-mode 'lisp-mode)
+  "List of major modes where lispxmp-hack-comment-dwim is enabled."
+  :type 'list
+  :group 'lispxmp)
 
 (defcustom lispxmp-string-no-properties t
   "*When non-nil, remove text priperties of strings in annotation."
@@ -413,7 +418,7 @@ The function is the subset of the paredit-rase-sexp in paredit.el"
 
 (defun lispxmp-hack-comment-dwim (orig-fun &rest args)
   "If comment-dwim is successively called, add => mark."
-  (if (and (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
+  (if (and (apply 'derived-mode-p lispxmp-comment-dwim-enable-modes)
            (eq last-command this-command)
            (not (member "=>" (list (ignore-errors (buffer-substring (- (point) 2) (point)))
                                    (ignore-errors (buffer-substring (point) (+ (point) 2)))))))
