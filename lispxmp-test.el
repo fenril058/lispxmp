@@ -4,7 +4,7 @@
 
 ;; Author: ril <fenril.nh@gmail.com>
 ;; Version: 1.0.0
-;; Package-Requires: ((cort "7.2.0") (paredit "20191121.2328"))
+;; Package-Requires: ((cort "7.2.0"))
 ;; Keywords:tools
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,6 @@
 
 ;;; Code:
 (require 'lispxmp)
-(require 'paredit)
 (require 'cort)
 
 (defun lispxmp-to-string (no-properties-p from)

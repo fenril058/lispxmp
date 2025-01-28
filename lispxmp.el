@@ -5,6 +5,7 @@
 
 ;; Author: rubikitch <rubikitch@ruby-lang.org>
 ;; Keywords: lisp, convenience
+;; Package-Version: 1.37
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/download/lispxmp.el
 
@@ -236,10 +237,7 @@
   :group 'emacs)
 
 (defcustom lispxmp-string-no-properties t
-  "*When non-nil, remove text priperties of strings in annotation.
-
-Need paredit.el.
-http://mumble.net/~campbell/emacs/paredit.el"
+  "*When non-nil, remove text priperties of strings in annotation."
   :type 'boolean
   :group 'lispxmp)
 
@@ -341,6 +339,27 @@ http://mumble.net/~campbell/emacs/paredit.el"
   (push (cons index (%lispxmp-prin1-to-string use-pp semicolons-len result)) lispxmp-results)
   result)
 
+(defun lispxmp-point-at-sexp-start ()
+  (save-excursion
+    (forward-sexp)
+    (backward-sexp)
+    (point)))
+
+(defun lispxmp-raise-sexp ()
+  "Raise the following S-expression in a tree, deleting its siblings.
+The function is the subset of the paredit-rase-sexp in paredit.el"
+  (save-excursion
+    ;; Select the S-expressions we want to raise in a buffer substring.
+    (let* ((bound (scan-sexps (point) 1))
+           (sexps
+            (buffer-substring (lispxmp-point-at-sexp-start) bound)))
+      ;; Move up to the list we're raising those S-expressions out of and
+      ;; delete it.
+      (backward-up-list)
+      (delete-region (point) (scan-sexps (point) 1))
+      (let* ((indent-start (point))
+             (indent-end (save-excursion (insert sexps) (point))))))))
+
 (defun %lispxmp-prin1-to-string (use-pp semicolons-len object)
   (let ((print-func (if use-pp 'pp-to-string 'prin1-to-string)))
     (with-temp-buffer
@@ -351,7 +370,7 @@ http://mumble.net/~campbell/emacs/paredit.el"
                    (require 'paredit nil t))
           (while (search-forward "#(\"" nil t)
             (forward-char -1)
-            (paredit-raise-sexp)
+            (lispxmp-raise-sexp)
             (delete-char -1)
             (forward-sexp 1))))
       (save-excursion
