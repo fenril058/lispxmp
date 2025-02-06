@@ -227,7 +227,7 @@
 ;;; Code:
 
 (defconst lispxmp-version "$Id: lispxmp.el,v 1.37 2017/01/10 23:11:59 rubikitch Exp $")
-(require 'cl-lib)
+(require 'cl-lib)                       ; => cl-lib
 (require 'newcomment)
 (require 'pp)
 
@@ -255,23 +255,25 @@
   "Annotate value of lines containing `; =>' in the current buffer.
 If a region active, annotate only in the region."
   (interactive)
-  (save-excursion
-    (save-restriction
+  (save-restriction
       (when (region-active-p)
         (narrow-to-region (region-beginning) (region-end)))
-      (lispxmp-create-code (current-buffer))
-      (delete-region (point-min) (point-max))
-      (insert-buffer-substring lispxmp-temp-buffer)
-      (unwind-protect
-          (if debug-on-error
-              (eval-buffer)
-            (condition-case err
+      (let ((pt (point)) (wstart (window-start (selected-window))))
+        (lispxmp-create-code (current-buffer))
+        (delete-region (point-min) (point-max))
+        (insert-buffer-substring lispxmp-temp-buffer)
+        (unwind-protect
+            (if debug-on-error
                 (eval-buffer)
-              (error
-               (ding)
-               ;; next action when error
-               (run-with-timer 0 nil 'message "Error in eval: %S" err))))
-        (lispxmp-create-annotations (current-buffer) lispxmp-results)))))
+              (condition-case err
+                  (eval-buffer)
+                (error
+                 (ding)
+                 ;; next action when error
+                 (run-with-timer 0 nil 'message "Error in eval: %S" err))))
+          (lispxmp-create-annotations (current-buffer) lispxmp-results)
+          (goto-char pt)
+          (set-window-start (selected-window) wstart))))) ; => lispxmp
 
 (defun lispxmp-create-code (buf)
   (setq lispxmp-results nil)
