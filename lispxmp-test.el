@@ -171,5 +171,65 @@ annotation,"
 ;;;    3
 " )))
 
+(cort-deftest-generate lispxmp/cl-lib :string=
+  '(((lispxmp-to-string nil "
+(require 'cl-lib)
+(cl-loop for i from 1 to 3
+      for y = (* i 2) do
+      (* i 10) ; =>
+      (+ i 1) ; =>
+)")
+     "
+(require 'cl-lib)
+(cl-loop for i from 1 to 3
+      for y = (* i 2) do
+      (* i 10) ; => 10, 20, 30
+      (+ i 1) ; => 2, 3, 4
+)
+"
+     )
+    ((lispxmp-to-string nil "
+(require 'cl-lib)
+(setq i 0)
+(progn
+  1                                     ; =>
+  )
+i                                       ; =>
+(dotimes (x 3)
+  i                                     ; =>
+  (cl-incf i)
+  i                                     ; => 1, 2, 3
+  )
+
+(+ 1                                    ; =>
+   (+ 3
+      ;; => 3
+      4)
+   ;; => 7
+   )
+;; => 8")
+     "
+(require 'cl-lib)
+(setq i 0)
+(progn
+  1                                     ; => 1
+  )
+i                                       ; => 0
+(dotimes (x 3)
+  i                                     ; => 0, 1, 2
+  (cl-incf i)
+  i                                     ; => 1, 2, 3
+  )
+
+(+ 1                                    ; => 1
+   (+ 3
+      ;; => 3
+      4)
+   ;; => 7
+   )
+;; => 8
+"
+     )))
+
 (provide 'lispxmp-test)
 ;;; lispxmp-test.el ends here
