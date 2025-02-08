@@ -227,8 +227,6 @@
 ;;; Code:
 
 (defconst lispxmp-version "$Id: lispxmp.el,v 1.37 2017/01/10 23:11:59 rubikitch Exp $")
-(require 'cl-lib)                       ; => cl-lib
-(require 'newcomment)
 (require 'pp)
 
 (defgroup lispxmp nil
@@ -290,30 +288,33 @@ If a region active, annotate only in the region."
 
 (defun lispxmp-adjust-pp-annotations ()
   (save-excursion
-    (cl-loop while (re-search-forward "^\\(;+\\)\\( +=> \\)" nil t)
-          for next-line-re = (concat
-                              "^"
-                              (regexp-quote
-                               (concat (match-string 1)
-                                       (make-string (- (match-end 2) (match-beginning 2))
-                                                    ?\s)))
-                              ".+\n")
-          do
-          (forward-line 1)
-          (while (looking-at next-line-re)
-            (delete-region (point) (progn (forward-line 1) (point)))))))
+    (goto-char (point-min))
+    (while (re-search-forward "^\\(;+\\)\\( +=> \\)" nil t)
+      (let ((next-line-re (concat
+                           "^"
+                           (regexp-quote
+                            (concat (match-string 1)
+                                    (make-string (- (match-end 2) (match-beginning 2))
+                                                 ?\s)))
+                           ".+\n")))
+        (forward-line 1)
+        (while (looking-at next-line-re)
+          (delete-region (point) (progn (forward-line 1) (point))))))))
 
 (defun lispxmp-add-out-markers ()
   (save-excursion
-    (cl-loop while (re-search-forward "\\(;+\\) +=>" nil t)
-          for use-pp = (eq (line-beginning-position) (match-beginning 0))
-          for semicolons = (match-string 1)
-          for i from 0
-          when (lispxmp-annotation-p) do
-          (delete-region (match-beginning 0) (line-end-position))
-          (lispxmp-out-make-sexp use-pp (length semicolons) i)
-          (insert (format "%s <<%%lispxmp-out-marker %d %d>>"
-                          semicolons (length semicolons) i)))))
+    (goto-char (point-min))
+    (let ((i 0))
+      (while (re-search-forward "\\(;+\\) +=>" nil t)
+        (let ((use-pp (eq (line-beginning-position) (match-beginning 0)))
+              (semicolons (match-string 1)))
+          (when (lispxmp-annotation-p)
+            (delete-region (match-beginning 0) (line-end-position))
+            (lispxmp-out-make-sexp use-pp (length semicolons) i)
+            (insert (format "%s <<%%lispxmp-out-marker %d %d>>"
+                            semicolons (length semicolons) i))
+            (setq i (1+ i))))))))
+
 ;; (progn (lispxmp-create-code (current-buffer))(display-buffer lispxmp-temp-buffer))
 (defun lispxmp-debug-buffer ()
   (interactive)
